@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory - ERP System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background-color: #006d6d; /* Teal */
+      color: white;
+      height: 100vh;
+      padding-top: 20px;
+      position: fixed;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 10px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      background-color: #004d4d;
+      cursor: pointer;
+    }
+
+    /* Main content */
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      width: calc(100% - 220px);
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: teal;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    form input, form select, form textarea {
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    form button {
+      grid-column: span 2;
+      padding: 12px;
+      background-color: teal;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    table th {
+      background-color: teal;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    tr:hover {
+      background-color: #e8f6f6;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      margin: 0 2px;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .edit-btn { background-color: orange; }
+    .delete-btn { background-color: red; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+<h2>ERP System</h2>
+<a href="{{ url_for('index') }}">Home</a>
+<a href="{{ url_for('inventory') }}">Inventory</a>
+<a href="{{ url_for('sales') }}">Sales</a>
+<a href="{{ url_for('product') }}">Product</a>
+<a href="{{ url_for('purchase') }}">Purchase</a>
+<a href="{{ url_for('hr') }}">Human Resource</a>
+<a href="{{ url_for('account') }}">Accounts</a>
+<a href="{{ url_for('contact_us') }}">Contact Us</a>
+</div>
+
+<div class="content">
+<div class="container">
+<h2>Inventory Management</h2>
+
+<form action="/inventory" method="POST">
+{% if edit_item %}
+<input type="hidden" name="id" value="{{ edit_item.id }}">
+{% endif %}
+
+<div>Category*</div>
+<select name="category" required>
+<option value="">Select Category</option>
+<option value="raw material" {% if edit_item and edit_item.category == 'raw material' %}selected{% endif %}>Raw Material</option>
+<option value="office supplies" {% if edit_item and edit_item.category == 'office supplies' %}selected{% endif %}>Office Supplies</option>
+<option value="stationary" {% if edit_item and edit_item.category == 'stationary' %}selected{% endif %}>Stationary</option>
+<option value="electronic" {% if edit_item and edit_item.category == 'electronic' %}selected{% endif %}>Electronic</option>
+<option value="groccery" {% if edit_item and edit_item.category == 'groccery' %}selected{% endif %}>Groccery</option>
+<option value="cloths" {% if edit_item and edit_item.category == 'cloths' %}selected{% endif %}>Cloths</option>
+</select>
+
+<div>Item Name*</div>
+<input type="text" name="item_name" placeholder="Item Name" value="{{ edit_item.item_name if edit_item else '' }}" required>
+
+<div>Item Code*</div>
+<input type="text" name="item_code" placeholder="Item Code" value="{{ edit_item.item_code if edit_item else '' }}" required>
+
+<div>Date*</div>
+<input type="date" name="date" value="{{ edit_item.date if edit_item else '' }}" required>
+
+<div>Previous Qty*</div>
+<input type="number" name="previous_qty" placeholder="Previous Qty" value="{{ edit_item.previous_qty if edit_item else '' }}" required>
+
+<div>Today Qty*</div>
+<input type="number" name="today_qty" placeholder="Today Qty" value="{{ edit_item.today_qty if edit_item else 0 }}" required>
+
+<div>Net Qty*</div>
+<input type="number" name="net_qty" placeholder="Net Qty" value="{{ edit_item.net_qty if edit_item else '' }}" readonly>
+
+<div>Per Unit Price*</div>
+<input type="text" name="per_unit_price" placeholder="Per Unit Price" value="{{ edit_item.per_unit_price if edit_item else '' }}" required>
+
+<div>Net Price*</div>
+<input type="text" name="net_price" placeholder="Net Price" value="{{ edit_item.net_price if edit_item else '' }}" readonly>
+
+<div>Storage Location*</div>
+<select name="location" required>
+<option value="">Select location</option>
+<option value="store a" {% if edit_item and edit_item.location == 'store a' %}selected{% endif %}>Store A</option>
+<option value="store b" {% if edit_item and edit_item.location == 'store b' %}selected{% endif %}>Store B</option>
+<option value="store c" {% if edit_item and edit_item.location == 'store c' %}selected{% endif %}>Store C</option>
+<option value="store d" {% if edit_item and edit_item.location == 'store d' %}selected{% endif %}>Store D</option>
+<option value="store e" {% if edit_item and edit_item.location == 'store e' %}selected{% endif %}>Store E</option>
+<option value="store f" {% if edit_item and edit_item.location == 'store f' %}selected{% endif %}>Store F</option>
+</select>
+
+<br><br>
+<button type="submit">{{ 'Update Item' if edit_item else 'Add Item' }}</button>
+</form>
+
+<hr>
+
+<table>
+<thead>
+<tr>
+<th>Item Name</th><th>Code</th><th>Date</th><th>Previous Qty</th><th>Today Qty</th>
+<th>Net Qty</th><th>Per Unit Price</th><th>Net Price</th><th>Category</th><th>Location</th><th>Actions</th>
+</tr>
+</thead>
+<tbody>
+{% for item in items %}
+<tr>
+<td>{{ item.item_name }}</td>
+<td>{{ item.item_code }}</td>
+<td>{{ item.date }}</td>
+<td>{{ item.previous_qty }}</td>
+<td>{{ item.today_qty }}</td>
+<td>{{ item.net_qty }}</td>
+<td>{{ item.per_unit_price }}</td>
+<td>{{ item.net_price }}</td>
+<td>{{ item.category }}</td>
+<td>{{ item.location }}</td>
+<td>
+<a href="/edit/{{ item.id }}"><button class="action-btn edit-btn">Edit</button></a>
+<a href="/delete_inventory/{{ item.id }}"><button class="action-btn delete-btn">Delete</button></a>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+</div>
+
+</body>
+</html>

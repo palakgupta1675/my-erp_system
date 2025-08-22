@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Forgot Password</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e0e0e0;
+      padding: 50px;
+    }
+
+    .container {
+      width: 380px;
+      margin: auto;
+      background-color: #fdfdfd;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.15);
+      
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: teal;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 95%;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+
+    input[type="submit"] {
+      background-color: teal;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #008080;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #444;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link a:hover {
+      color: teal;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Forgot Password</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          {% if category == 'danger' %}
+            <li style="color: red;">{{ message }}</li>
+          {% else %}
+            <li style="color: green;">{{ message }}</li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('forget_pass') }}">
+
+      {% if not question %}
+        <!-- Step 1: Enter username -->
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="{{ username or '' }}" required>
+        <input type="submit" value="Get Security Question" >
+      {% else %}
+        <!-- Step 2: Show question + answer + new password -->
+        <input type="hidden" name="username" value="{{ username }}">
+
+        <label>Security Question:</label>
+        <div style="font-weight:bold; margin-bottom:10px;">{{ question }}</div>
+
+        <label for="answer">Answer:</label>
+        <input type="text" id="answer" name="answer" required>
+
+        <label for="new_password">New Password:</label>
+        <input type="password" id="new_password" name="new_password" required minlength="6">
+
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+
+        <input type="submit" value="Reset Password" >
+      {% endif %}
+    </form>
+
+    <div class="back-link">
+      <a href="{{ url_for('login') }}"><b> Back to Login</b></a>
+    </div>
+  </div>
+
+</body>
+</html>

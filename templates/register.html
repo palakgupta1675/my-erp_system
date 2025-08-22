@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registration Page</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e0e0e0;
+      padding: 30px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: teal;
+    }
+
+    .container {
+      width: 480px;
+      padding: 35px;
+      background-color: #fdfdfd;
+      border-radius: 12px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    select {
+      width: 95%;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+
+    .btn-group {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    input[type="submit"],
+    input[type="reset"] {
+      padding: 10px 24px;
+      margin: 0 10px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: teal;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover,
+    input[type="reset"]:hover {
+      background-color: #007979;
+    }
+    .mobile-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.code-box {
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.mobile-box {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+  </style>
+</head>
+<body>
+
+  <div class="title">Register Here!</div>
+
+  <div class="container">
+    <form action="{{ url_for('register') }}" method="post">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          <ul>
+          {% for message in messages %}
+              <li style="color: red;">{{ message }}</li>
+          {% endfor %}
+          </ul>
+      {% endif %}
+      {% endwith %}
+
+
+      <label for="firstname">First Name: <span style="color: red;">*</label>
+      <input type="text" id="firstname" name="firstname" required  placeholder="Enter your first name">
+
+      <label for="lastname">Last Name: <span style="color: red;">*</label>
+      <input type="text" id="lastname" name="lastname" required  placeholder="Enter your last name">
+
+      <label for="username">Username: <span style="color: red;">*</span></label>
+      <input type="text" id="username" name="username" placeholder="Enter the username" pattern="^[A-Za-z0-9_]{8,10}$" title="Only [A-Za-z0-9_]{8,10} are allowed" required>
+
+      <label for="password">Password: <span style="color: red;">*</label>
+      <input type="text" id="password" name="password" title="password must be 8-16 characters and can include A-Z, 0-9, and !@#$%^&*() required" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+
+      <label for="confirm">Confirm Password: <span style="color: red;">*</label>
+      <input type="password" id="confirm" name="confirm" required>
+      
+      <label>Email:<span style="color: red;">*</span></label>
+      <input type="email" id="email" name="email" 
+       pattern="[a-z0-9._%+-]+@(gmail\.com|yahoo\.com)$"
+       title="Only Gmail and Yahoo email addresses are allowed"
+       required>
+      
+       <label for="phone">Phone Number: <span style="color: red;">*</label>
+      <div class="mobile-inline">
+        <select name="country_code" class="code-box" required>
+          <option value="+91">+91 (India)</option>
+          <option value="+1">+1 (Usa)</option>
+          <option value="+44">+44(Uk)</option>
+          <option value="+61">+61(Australia)</option>
+        </select>
+      <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+      </div>
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required>
+
+      <label for="security">Security Question: <span style="color: red;">*</label>
+      <select id="security" name="security" required style="width: 100%;">
+        <option value="">-- Select a question --</option>
+        <option value="What is your first school name? ">What is your first school name?</option>
+        <option value="What is the name of your childhood best friend?">What is the name of your childhood best friend?</option>
+        <option value="What is your favorite teacher's name?">What is your favorite teacher's name?</option>
+        <option value="Which city were you born in?">Which city were you born in?</option>
+      </select>
+
+      <label for="answer">Answer: <span style="color: red;">*</label>
+      <input type="text" id="answer" name="answer" required>
+
+      <label for="roles">Roles: <span style="color: red;">*</label>
+      <select id="roles" name="roles" required style="width: 100%;">
+        <option value="">-- Select a role --</option>
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="hr">HR</option>
+        <option value="accountant">account</option>
+        <option value="sales">Sales</option>
+        <option value="inventory">Inventory</option>
+      </select>
+
+      <div class="btn-group">
+        <input type="submit" value="Submit">
+        <input type="reset" value="Reset">
+      </div>
+
+    </form>
+        
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="{{ url_for('login') }}" style="color: teal; text-decoration: none; font-weight: bold;">Back to Login</a>
+    </div>
+  </div>
+
+  </div>
+
+</body>
+</html>

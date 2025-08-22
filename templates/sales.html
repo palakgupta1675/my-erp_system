@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP System - Sales</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f1f4f6;
+        display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 220px;
+        background-color: #004d4d; /* teal */
+        color: white;
+        height: 100vh;
+        padding-top: 20px;
+        position: fixed;
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 22px;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+        padding-bottom: 10px;
+    }
+
+    .sidebar a {
+        display: block;
+        padding: 12px 20px;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+    }
+
+    .sidebar a:hover {
+        background-color: #006666;
+        cursor: pointer;
+    }
+
+    /* Main content */
+    .content {
+        margin-left: 220px;
+        padding: 20px;
+        width: calc(100% - 220px);
+    }
+
+    h1, h2 {
+        color: #004d4d;
+        text-align: center;
+    }
+
+    form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input, select {
+        padding: 8px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .full-width {
+        grid-column: 1 / 3;
+    }
+
+    button {
+        grid-column: 1 / 3;
+        padding: 10px;
+        background-color: #004d4d;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    button:hover {
+        background-color: #006666;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #e0e0e0;
+        color: #004d4d;
+    }
+
+    form.inline {
+        display: inline;
+    }
+
+    a button {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>ERP System</h2>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('inventory') }}">Inventory</a>
+    <a href="{{ url_for('sales') }}">Sales</a>
+    <a href="{{ url_for('product') }}">Product</a>
+    <a href="{{ url_for('purchase') }}">Purchase</a>
+    <a href="{{ url_for('hr') }}">Human Resource</a>
+    <a href="{{ url_for('account') }}">Accounts</a>
+    <a href="{{ url_for('contact_us') }}">Contact Us</a>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <h1>ERP System - Sales</h1>
+
+    <!-- Add / Update Sale Form -->
+    <h2>{{ 'Update Sale' if edit_data else 'Add Sale' }}</h2>
+    <form method="POST" action="{{ url_for('sales') }}">
+        <input type="hidden" name="sale_id" value="{{ edit_data[0] if edit_data else '' }}">
+
+        <label>Customer Name</label>
+        <input type="text" name="customer_name" value="{{ edit_data[1] if edit_data else '' }}" required>
+
+        <label>Customer Contact</label>
+        <input type="tel" name="customer_contact" value="{{ edit_data[2] if edit_data else '' }}" pattern="[0-9]{10}" required>
+
+        <label>Product Name</label>
+        <input type="text" name="product_name" value="{{ edit_data[3] if edit_data else '' }}" required>
+
+        <label>Product Code</label>
+        <input type="text" name="product_code" value="{{ edit_data[4] if edit_data else '' }}" required>
+
+        <label>Quantity</label>
+        <input type="number" name="quantity" value="{{ edit_data[5] if edit_data else '' }}" min="1" required>
+
+        <label>Price Per Unit</label>
+        <input type="number" name="price_per_unit" value="{{ edit_data[6] if edit_data else '' }}" min="0" step="0.01" required>
+
+        <label>Discount (%)</label>
+        <input type="number" name="discount" value="{{ edit_data[7] if edit_data else '' }}" min="0" max="100" step="0.01">
+
+        <label>GST (%)</label>
+        <input type="number" name="gst" value="{{ edit_data[8] if edit_data else '' }}" min="0" max="28" step="0.01">
+
+        <label>Remarks</label>
+        <input type="text" name="remarks" value="{{ edit_data[9] if edit_data else '' }}">
+
+        <button type="submit">{{ 'Update' if edit_data else 'Add Sale' }}</button>
+    </form>
+
+    <!-- Sales Table -->
+    <h2>Sales Records</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Customer</th><th>Contact</th><th>Product</th><th>Code</th>
+                <th>Qty</th><th>Price/Unit</th><th>Discount</th><th>GST</th><th>Total</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sale in sales_data %}
+        <tr>
+            <td>{{ sale[0] }}</td>
+            <td>{{ sale[1] }}</td>
+            <td>{{ sale[2] }}</td>
+            <td>{{ sale[3] }}</td>
+            <td>{{ sale[4] }}</td>
+            <td>{{ sale[5] }}</td>
+            <td>₹{{ sale[6] }}</td>
+            <td>{{ sale[7] }}%</td>
+            <td>{{ sale[8] }}%</td>
+            <td>₹{{ sale[10] }}</td>
+            <td>
+                <a href="{{ url_for('edit_sale', sale_id=sale[0]) }}"><button type="button">Edit</button></a>
+                <form class="inline" method="POST" action="{{ url_for('delete_sale', sale_id=sale[0]) }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

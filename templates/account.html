@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ERP - Accounts</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f1f4f6;
+      color: #333;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background-color: #004d4d; /* dark teal */
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      background-color: #006666;
+    }
+
+    /* Main content */
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      width: calc(100% - 220px);
+    }
+
+    .container {
+      width: 95%;
+      margin: auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #004d4d;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-primary { background-color: teal; color: white; }
+    .btn-info    { background-color: #17a2b8; color: white; }
+    .btn-danger  { background-color: #dc3545; color: white; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #006666;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f0f8ff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>ERP System</h2>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('inventory') }}">Inventory</a>
+    <a href="{{ url_for('sales') }}">Sales</a>
+    <a href="{{ url_for('product') }}">Product</a>
+    <a href="{{ url_for('purchase') }}">Purchase</a>
+    <a href="{{ url_for('hr') }}">Human Resource</a>
+    <a href="{{ url_for('account') }}">Accounts</a>
+    <a href="{{ url_for('contact_us') }}">Contact Us</a>
+    
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <div class="container">
+      <h2>Accounts Management</h2>
+
+      <!-- Add Transaction Form -->
+      <form method="POST" action="{{ url_for('account') }}">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" name="date" required>
+          </div>
+          <div class="form-group">
+            <label>Transaction Type</label>
+            <select name="transaction_type" required>
+              <option value="">Select</option>
+              <option value="credit">Credit</option>
+              <option value="debit">Debit</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="number" name="amount" placeholder="Enter amount" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 1 1 100%;">
+            <label>Description</label>
+            <textarea name="description" rows="2" placeholder="Enter details"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Transaction</button>
+      </form>
+
+      <!-- Transaction List -->
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for acc in accounts %}
+          <tr>
+            <td>{{ acc[0] }}</td>
+            <td>{{ acc[1] }}</td>
+            <td>{{ acc[2] }}</td>
+            <td>{{ acc[3] }}</td>
+            <td>{{ acc[4] }}</td>
+            <td>
+              <!-- Edit Button -->
+              <form method="POST" action="/accounts/edit/{{ acc[0] }}" style="display:inline;">
+                <button type="submit" class="btn btn-info">Edit</button>
+              </form>
+              <!-- Delete Button -->
+              <form method="POST" action="/accounts/delete/{{ acc[0] }}" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>
