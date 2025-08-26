@@ -183,42 +183,43 @@ tr:hover {
 
         <div class="form-group">
             <label>Name:</label>
-            <input type="text" name="name" value="{{ edit_data[1] if edit_data else '' }}" required>
+            <input type="text" name="name" value="{{ edit_data[1] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Email:</label>
-            <input type="email" name="email" value="{{ edit_data[2] if edit_data else '' }}" required>
+            <input type="email" name="email" value="{{ edit_data[2] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Phone:</label>
-            <input type="text" name="phone" value="{{ edit_data[3] if edit_data else '' }}" required>
+            <input type="text" name="phone" value="{{ edit_data[3] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Department:</label>
-            <input type="text" name="department" value="{{ edit_data[4] if edit_data else '' }}" required>
+            <input type="text" name="department" value="{{ edit_data[4] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Designation:</label>
-            <input type="text" name="designation" value="{{ edit_data[5] if edit_data else '' }}" required>
+            <input type="text" name="designation" value="{{ edit_data[5] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Joining Date:</label>
-            <input type="date" name="joining_date" value="{{ edit_data[6] if edit_data else '' }}" required>
+            <input type="date" name="joining_date" value="{{ edit_data[6] if edit_data else '' }}">
         </div>
         <div class="form-group">
             <label>Salary:</label>
-            <input type="number" step="0.01" name="salary" value="{{ edit_data[7] if edit_data else '' }}" required>
+            <input type="number" step="0.01" name="salary" value="{{ edit_data[7] if edit_data else '' }}">
         </div>
 
         <button type="submit">{{ 'Update' if edit_data else 'Save' }}</button>
     </form>
 
-    <!-- 🔍 Search by Phone -->
-    <form method="GET" action="{{ url_for('hr') }}" style="margin-top:20px;">
-        <label>Search Employee by Phone:</label>
-        <input type="text" name="search_phone" placeholder="Enter phone number">
+    <hr>
+
+    <!-- Search Form -->
+    <h3>Search Employee by Phone</h3>
+    <form method="POST" action="{{ url_for('hr') }}">
+        <input type="text" name="search_phone" placeholder="Enter phone number" value="{{ search_value }}">
         <button type="submit">Search</button>
-        <a href="{{ url_for('hr') }}"><button type="button">Reset</button></a>
     </form>
 
     <!-- HR Table -->

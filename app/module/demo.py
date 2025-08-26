@@ -1,18 +1,11 @@
-from flask import Flask,render_template,request,redirect,flash,url_for,session
-import mysql.connector
-import traceback
+from app import app,cursor,mydb
+import os
 import re
+from flask import Flask,render_template,request,redirect,flash,url_for,session
+import traceback
 
-app=Flask(__name__)
-app.secret_key="test_123"
 
-mydb=mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="erp_system"
-)
-cursor = mydb.cursor()
+
 
 @app.route('/')
 def index():
@@ -635,6 +628,5 @@ def contact_us():
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
 
