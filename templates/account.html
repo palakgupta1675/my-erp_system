@@ -15,7 +15,7 @@
     /* Sidebar */
     .sidebar {
       width: 220px;
-      background-color: #004d4d; /* dark teal */
+      background-color: teal;
       color: white;
       height: 100vh;
       position: fixed;
@@ -40,7 +40,7 @@
     }
 
     .sidebar a:hover {
-      background-color: #006666;
+      background-color: #004d4d;
     }
 
     /* Main content */
@@ -61,7 +61,7 @@
 
     h2 {
       text-align: center;
-      color: #004d4d;
+      color: teal;
       margin-bottom: 20px;
     }
 
@@ -73,10 +73,12 @@
       display: flex;
       gap: 15px;
       margin-bottom: 15px;
+      flex-wrap: wrap;
     }
 
     .form-group {
       flex: 1;
+      min-width: 200px;
     }
 
     label {
@@ -103,6 +105,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 5px;
     }
 
     .btn-primary { background-color: teal; color: white; }
@@ -143,9 +146,8 @@
     <a href="{{ url_for('product') }}">Product</a>
     <a href="{{ url_for('purchase') }}">Purchase</a>
     <a href="{{ url_for('hr') }}">Human Resource</a>
-    <a href="{{ url_for('account') }}">Accounts</a>
+    <a href="{{ url_for('account') }}" class="active">Accounts</a>
     <a href="{{ url_for('contact_us') }}">Contact Us</a>
-    
   </div>
 
   <!-- Main Content -->
@@ -153,35 +155,73 @@
     <div class="container">
       <h2>Accounts Management</h2>
 
-      <!-- Add Transaction Form -->
+      <!-- Add / Edit Transaction Form -->
       <form method="POST" action="{{ url_for('account') }}">
+        {% if edit_data %}
+        <input type="hidden" name="edit_id" value="{{ edit_data[0] }}">
+        {% endif %}
+
+        <!-- Row 1 -->
         <div class="form-row">
           <div class="form-group">
-            <label>Date</label>
-            <input type="date" name="date" required>
+            <label>Date<span style="color: red;">*</label>
+            <input type="date" name="date" value="{{ edit_data[1] if edit_data else '' }}" required>
           </div>
           <div class="form-group">
-            <label>Transaction Type</label>
+            <label>Transaction Type<span style="color: red;">*</label>
             <select name="transaction_type" required>
               <option value="">Select</option>
-              <option value="credit">Credit</option>
-              <option value="debit">Debit</option>
+              <option value="credit" {% if edit_data and edit_data[2]=='credit' %}selected{% endif %}>Credit</option>
+              <option value="debit" {% if edit_data and edit_data[2]=='debit' %}selected{% endif %}>Debit</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Amount</label>
-            <input type="number" name="amount" placeholder="Enter amount" required>
+            <label>Amount<span style="color: red;">*</label>
+            <input type="number" name="amount" value="{{ edit_data[3] if edit_data else '' }}" placeholder="Enter amount" required>
           </div>
         </div>
 
+        <!-- Row 2: Sales / Purchase -->
         <div class="form-row">
-          <div class="form-group" style="flex: 1 1 100%;">
-            <label>Description</label>
-            <textarea name="description" rows="2" placeholder="Enter details"></textarea>
+          <div class="form-group">
+            <label>Category<span style="color: red;">*</label>
+            <select name="category" required>
+              <option value="">Select</option>
+              <option value="sales" {% if edit_data and edit_data[5]=='sales' %}selected{% endif %}>Sales</option>
+              <option value="purchase" {% if edit_data and edit_data[5]=='purchase' %}selected{% endif %}>Purchase</option>
+              <option value="product" {% if edit_data and edit_data[5]=='product' %}selected{% endif %}>Product</option>
+              <option value="other" {% if edit_data and edit_data[5]=='other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Product / Item Name<span style="color: red;">*</label>
+            <input type="text" name="product_name" value="{{ edit_data[6] if edit_data else '' }}" placeholder="Enter product/item name">
+          </div>
+          <div class="form-group">
+            <label>Quantity<span style="color: red;">*</label>
+            <input type="number" name="quantity" value="{{ edit_data[7] if edit_data else '' }}" placeholder="Enter quantity">
+          </div>
+          <div class="form-group">
+            <label>Unit Price<span style="color: red;">*</label>
+            <input type="number" step="0.01" name="unit_price" value="{{ edit_data[8] if edit_data else '' }}" placeholder="Unit price">
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Add Transaction</button>
+        <!-- Row 3: Calculated Total + Description -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Total Amount<span style="color: red;">*</label>
+            <input type="number" step="0.01" name="total_amount" value="{{ edit_data[9] if edit_data else '' }}" placeholder="Auto-calculated" readonly>
+          </div>
+          <div class="form-group" style="flex: 1 1 100%;">
+            <label>Description<span style="color: red;">*</label>
+            <textarea name="description" rows="2" placeholder="Enter details">{{ edit_data[4] if edit_data else '' }}</textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          {{ 'Update Transaction' if edit_data else 'Add Transaction' }}
+        </button>
       </form>
 
       <!-- Transaction List -->
@@ -191,6 +231,10 @@
             <th>ID</th>
             <th>Date</th>
             <th>Type</th>
+            <th>Category</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
             <th>Amount</th>
             <th>Description</th>
             <th>Actions</th>
@@ -202,14 +246,14 @@
             <td>{{ acc[0] }}</td>
             <td>{{ acc[1] }}</td>
             <td>{{ acc[2] }}</td>
-            <td>{{ acc[3] }}</td>
+            <td>{{ acc[5] }}</td>
+            <td>{{ acc[6] }}</td>
+            <td>{{ acc[7] }}</td>
+            <td>₹{{ acc[8] }}</td>
+            <td>₹{{ acc[3] }}</td>
             <td>{{ acc[4] }}</td>
             <td>
-              <!-- Edit Button -->
-              <form method="POST" action="/accounts/edit/{{ acc[0] }}" style="display:inline;">
-                <button type="submit" class="btn btn-info">Edit</button>
-              </form>
-              <!-- Delete Button -->
+              <a href="{{ url_for('account', edit_id=acc[0]) }}" class="btn btn-info">Edit</a>
               <form method="POST" action="/accounts/delete/{{ acc[0] }}" style="display:inline;">
                 <button type="submit" class="btn btn-danger">Delete</button>
               </form>
@@ -218,6 +262,7 @@
           {% endfor %}
         </tbody>
       </table>
+
     </div>
   </div>
 

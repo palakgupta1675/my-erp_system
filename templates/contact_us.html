@@ -175,22 +175,22 @@
       <!-- Contact form -->
       <form action="{{ url_for('contact_us') }}" method="POST">
         <div class="field">
-          <label for="name">Your Name</label>
+          <label for="name">Your Name<span style="color: red;">*</label>
           <input id="name" name="name" type="text" required />
         </div>
 
         <div class="field">
-          <label for="email">Email</label>
+          <label for="email">Email<span style="color: red;">*</label>
           <input id="email" name="email" type="email" required />
         </div>
 
         <div class="field">
-          <label for="phone">Phone</label>
+          <label for="phone">Phone<span style="color: red;">*</label>
           <input id="phone" name="phone" type="tel" required />
         </div>
 
         <div class="field full">
-          <label for="message">Message</label>
+          <label for="message">Message<span style="color: red;">*</label>
           <textarea id="message" name="message" placeholder="Tell us how we can help…" required></textarea>
         </div>
 

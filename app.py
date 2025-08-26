@@ -85,42 +85,44 @@ def register():
             return redirect(url_for('register'))
 
     return render_template('register.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form["username"].strip()
-        password = request.form["password"].strip()
+        username = request.form["username"]
+        password = request.form["password"]
 
-        cursor.execute("SELECT * FROM register WHERE username=%s AND password=%s", (username, password))
+        # Initialize login attempts in session
+        if 'login_attempts' not in session:
+            session['login_attempts'] = 0
+
+        # Check user credentials
+        cursor.execute(
+            "SELECT * FROM register WHERE username=%s AND password=%s",
+            (username, password)
+        )
         user = cursor.fetchone()
 
         if user:
-            session['username'] = user[2]  # username
-            session['role'] = str(user[9]).strip().lower()
-            print("DEBUG: ROLE after login =>", repr(session['role']))
+            # Reset login attempts on successful login
+            session['login_attempts'] = 0
+            flash("Login successful")
+            return redirect(url_for('index'))
 
-            flash("Login successful", "success")
+        else:
+            # Increase login attempt count
+            session['login_attempts'] += 1  
 
-            if session['role'] == "inventory":
-                return redirect(url_for('inventory'))
-            elif session['role'] == "sales":
-                return redirect(url_for('sales'))
-            elif session['role'] == "hr":
-                return redirect(url_for('hr'))
-            elif session['role'] == "account":
-                return redirect(url_for('account'))
-            elif session['role'] == "purchase":
-                return redirect(url_for('purchase'))
-            elif session['role'] == "product":
-                return redirect(url_for('product'))
-            else:
-                return redirect(url_for('index'))
+            # If 3 failed attempts, redirect to forgot password page
+            if session['login_attempts'] >= 3:
+                flash("Too many failed attempts. Redirecting to forgot password.")
+                session['login_attempts'] = 0  
+                return redirect(url_for('forget_pass'))  
 
-        flash("Invalid credentials", "danger")
-        return redirect(url_for('login'))
+            flash(f"Invalid credentials. Attempt {session['login_attempts']} of 3.")
+            return redirect(url_for('login'))
 
     return render_template('login.html')
+
 
 
 @app.route('/forget_pass', methods=['GET', 'POST'])
@@ -187,10 +189,6 @@ def forget_pass():
 @app.route('/inventory', methods=['GET', 'POST'])
 def inventory():
     #  Role check
-    print("DEBUG: ROLE in inventory route =>", repr(session.get('role')))
-    if 'role' not in session or session['role'].strip().lower() != "inventory":
-        flash("Access denied! Only Inventory role can access this page.")
-        return redirect(url_for('login'))
     if request.method == 'POST':
         item_id = request.form.get('id')  # for edit
         item_name = request.form['item_name']
@@ -252,9 +250,6 @@ def inventory():
 @app.route('/delete_inventory/<int:id>')
 def delete_inventory(id):
     #  Role check
-    if 'role' not in session or session['role'] != 'inventory':
-        flash("Access denied!", "danger")
-        return redirect(url_for('login'))
 
     cursor.execute("DELETE FROM inventory WHERE id=%s", (id,))
     mydb.commit()
@@ -265,10 +260,7 @@ def delete_inventory(id):
 # Edit Inventory Item (pre-fill form)
 @app.route('/edit/<int:id>')
 def edit_inventory(id):
-    #  Role check
-    if 'role' not in session or session['role'] != 'inventory':
-        flash("Access denied!", "danger")
-        return redirect(url_for('login'))
+    #  Role chec
 
     cursor.execute("SELECT * FROM inventory WHERE id=%s", (id,))
     row = cursor.fetchone()
@@ -493,98 +485,127 @@ def delete_purchase(purchase_id):
 @app.route('/hr', methods=['GET', 'POST'])
 def hr():
     if request.method == "POST":
-        # Get form data
-        emp_id = request.form["emp_id"]
-        name = request.form["name"]
-        email = request.form["email"]
-        phone = request.form["phone"]
-        department = request.form["department"]
-        designation = request.form["designation"]
-        joining_date = request.form["joining_date"]
-        salary = request.form["salary"]
+        emp_id = request.form.get("emp_id")  # hidden field for update
+        name = request.form.get("name")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        department = request.form.get("department")
+        designation = request.form.get("designation")
+        joining_date = request.form.get("joining_date")
+        salary = request.form.get("salary")
 
-        try:
-            # Insert into database
-            cursor.execute("""
-                INSERT INTO hr (emp_id, name, email, phone, department, designation, joining_date, salary)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (emp_id, name, email, phone, department, designation, joining_date, salary))
+        # If it's a Save or Update request
+        if name and email and phone:
+            if emp_id:  # Update existing record
+                cursor.execute("""
+                    UPDATE hr SET
+                        name=%s, email=%s, phone=%s, department=%s,
+                        designation=%s, joining_date=%s, salary=%s
+                    WHERE emp_id=%s
+                """, (name, email, phone, department, designation, joining_date, salary, emp_id))
+            else:  # Insert new record
+                cursor.execute("""
+                    INSERT INTO hr (name, email, phone, department, designation, joining_date, salary)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (name, email, phone, department, designation, joining_date, salary))
 
             mydb.commit()
-            flash("Employee added successfully!", "success")
+            return redirect(url_for('hr'))
 
-        except Exception as e:
-            flash(f"Error: {e}", "danger")
+        # If it's a search request
+        search_phone = request.form.get("search_phone")
+        if search_phone:
+            cursor.execute("SELECT * FROM hr WHERE phone = %s", (search_phone,))
+            employees = cursor.fetchall()
+            return render_template("hr.html", employees=employees, edit_data=None, search_value=search_phone)
 
-        return redirect(url_for('hr'))
-
-    # Fetch all records
+    # GET request - fetch all records
     cursor.execute("SELECT * FROM hr")
     employees = cursor.fetchall()
+    return render_template("hr.html", employees=employees, edit_data=None, search_value="")
 
-    return render_template("hr.html", items=employees)
+# Edit HR
+@app.route('/hr/edit/<int:emp_id>')
+def edit_hr(emp_id):
+    cursor.execute("SELECT * FROM hr WHERE emp_id=%s", (emp_id,))
+    record = cursor.fetchone()
+    cursor.execute("SELECT * FROM hr")
+    employees = cursor.fetchall()
+    return render_template("hr.html", employees=employees, edit_data=record, search_value="")
+
+# Delete HR
+@app.route('/hr/delete/<int:emp_id>', methods=['POST'])
+def delete_hr(emp_id):
+    cursor.execute("DELETE FROM hr WHERE emp_id=%s", (emp_id,))
+    mydb.commit()
+    return redirect(url_for('hr'))
 
 
-@app.route("/account", methods=["GET", "POST"])
+
+@app.route('/account', methods=['GET', 'POST'])
 def account():
-    if request.method == "POST":
-        date = request.form["date"]
-        t_type = request.form["transaction_type"]
-        amount = request.form["amount"]
-        description = request.form["description"]
+    edit_data = None
 
-        cursor.execute(
-            "INSERT INTO accounts (date, transaction_type, amount, description) VALUES (%s, %s, %s, %s)",
-            (date, t_type, amount, description)
-        )
+    if request.method == 'POST':
+        acc_id = request.form.get('acc_id')
+        date = request.form['date']
+        transaction_type = request.form['transaction_type']
+        amount = float(request.form.get('amount', 0))
+        description = request.form.get('description')
+        category = request.form.get('category')
+        product_name = request.form.get('product_name')
+        quantity = int(request.form.get('quantity', 0))
+        unit_price = float(request.form.get('unit_price', 0))
+
+        # Calculate total_amount automatically for sales/purchase/product
+        if category in ['sales', 'purchase', 'product']:
+            total_amount = quantity * unit_price
+        else:
+            total_amount = amount
+
+        if acc_id:  # Update
+            cursor.execute("""
+                UPDATE accounts 
+                SET date=%s, transaction_type=%s, amount=%s, description=%s,
+                    category=%s, product_name=%s, quantity=%s, unit_price=%s, total_amount=%s
+                WHERE acc_id=%s
+            """, (date, transaction_type, amount, description, category, product_name, quantity, unit_price, total_amount, acc_id))
+            flash("Transaction updated successfully!", "success")
+        else:      # Add new
+            cursor.execute("""
+                INSERT INTO accounts (date, transaction_type, amount, description, category, product_name, quantity, unit_price, total_amount)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (date, transaction_type, amount, description, category, product_name, quantity, unit_price, total_amount))
+            flash("Transaction added successfully!", "success")
+
         mydb.commit()
-        flash("Transaction added successfully!", "success")
-        return redirect(url_for("account"))
+        return redirect(url_for('account'))
 
-    cursor.execute("SELECT * FROM accounts")
+    # If edit requested via query parameter
+    edit_id = request.args.get('edit_id')
+    if edit_id:
+        cursor.execute("SELECT * FROM accounts WHERE acc_id=%s", (edit_id,))
+        edit_data = cursor.fetchone()
+
+    # Fetch all transactions
+    cursor.execute("SELECT * FROM accounts ORDER BY acc_id DESC")
     accounts = cursor.fetchall()
-    return render_template("account.html", accounts=accounts)
 
+    return render_template("account.html", accounts=accounts, edit_data=edit_data)
 
-# edit
+# Edit route (just redirects to account page with edit_id)
+@app.route('/accounts/edit/<int:acc_id>', methods=['POST'])
+def edit_account(acc_id):
+    return redirect(url_for('account', edit_id=acc_id))
 
-@app.route("/account/edit/<int:id>", methods=["POST", "GET"])
-def edit_account(id):
-    if request.method == "POST":
-        # fetch row for editing
-        cursor.execute("SELECT * FROM accounts WHERE id=%s", (id,))
-        acc = cursor.fetchone()
-
-        # render same page with row data prefilled
-        cursor.execute("SELECT * FROM accounts")
-        accounts = cursor.fetchall()
-        return render_template("accounts_edit.html", accounts=accounts, acc=acc)
-
-    return redirect(url_for("account"))
-
-
-@app.route("/account/update/<int:id>", methods=["POST"])
-def update_account(id):
-    date = request.form["date"]
-    t_type = request.form["transaction_type"]
-    amount = request.form["amount"]
-    description = request.form["description"]
-
-    cursor.execute(
-        "UPDATE accounts SET date=%s, transaction_type=%s, amount=%s, description=%s WHERE id=%s",
-        (date, t_type, amount, description, id)
-    )
+# Delete route
+@app.route('/accounts/delete/<int:acc_id>', methods=['POST'])
+def delete_account(acc_id):
+    cursor.execute("DELETE FROM accounts WHERE acc_id=%s", (acc_id,))
     mydb.commit()
-    flash("Transaction updated successfully!", "info")
-    return redirect(url_for("account"))
+    flash("Transaction deleted successfully!", "success")
+    return redirect(url_for('account'))
 
-# delete
-@app.route("/account/delete/<int:id>", methods=["POST"])
-def delete_account(id):
-    cursor.execute("DELETE FROM accounts WHERE id=%s", (id,))
-    mydb.commit()
-    flash("Transaction deleted successfully!", "danger")
-    return redirect(url_for("account"))
 
 @app.route("/contact_us", methods=["GET", "POST"])
 def contact_us():

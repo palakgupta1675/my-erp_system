@@ -171,25 +171,25 @@
     <form method="POST" action="{{ url_for('purchase') }}">
         <input type="hidden" name="purchase_id" value="{{ edit_data[0] if edit_data else '' }}">
 
-        <label>Supplier:</label>
+        <label>Supplier:<span style="color: red;">*</label>
         <input type="text" name="supplier_name" value="{{ edit_data[1] if edit_data else '' }}" required>
 
-        <label>Item Name:</label>
+        <label>Item Name:<span style="color: red;">*</label>
         <input type="text" name="item_name" value="{{ edit_data[2] if edit_data else '' }}" required>
 
-        <label>Item Code:</label>
+        <label>Item Code:<span style="color: red;">*</label>
         <input type="text" name="item_code" value="{{ edit_data[3] if edit_data else '' }}" required>
 
-        <label>Purchase Date:</label>
+        <label>Purchase Date:<span style="color: red;">*</label>
         <input type="date" name="purchase_date" value="{{ edit_data[4] if edit_data else '' }}" required>
 
-        <label>Quantity:</label>
+        <label>Quantity:<span style="color: red;">*</label>
         <input type="number" name="quantity" value="{{ edit_data[5] if edit_data else '' }}" required>
 
-        <label>Unit Price:</label>
+        <label>Unit Price:<span style="color: red;">*</label>
         <input type="number" step="0.01" name="unit_price" value="{{ edit_data[6] if edit_data else '' }}" required>
 
-        <label>Status:</label>
+        <label>Status:<span style="color: red;">*</label>
         <select name="status">
             <option value="Pending" {% if edit_data and edit_data[8]=='Pending' %}selected{% endif %}>Pending</option>
             <option value="Received" {% if edit_data and edit_data[8]=='Received' %}selected{% endif %}>Received</option>

@@ -159,31 +159,31 @@
 <option value="cloths" {% if edit_item and edit_item.category == 'cloths' %}selected{% endif %}>Cloths</option>
 </select>
 
-<div>Item Name*</div>
+<div>Item Name<span style="color: red;">*</div>
 <input type="text" name="item_name" placeholder="Item Name" value="{{ edit_item.item_name if edit_item else '' }}" required>
 
-<div>Item Code*</div>
+<div>Item Code<span style="color: red;">*</div>
 <input type="text" name="item_code" placeholder="Item Code" value="{{ edit_item.item_code if edit_item else '' }}" required>
 
-<div>Date*</div>
+<div>Date<span style="color: red;">*</div>
 <input type="date" name="date" value="{{ edit_item.date if edit_item else '' }}" required>
 
-<div>Previous Qty*</div>
+<div>Previous Qty<span style="color: red;">*</div>
 <input type="number" name="previous_qty" placeholder="Previous Qty" value="{{ edit_item.previous_qty if edit_item else '' }}" required>
 
-<div>Today Qty*</div>
+<div>Today Qty<span style="color: red;">*</div>
 <input type="number" name="today_qty" placeholder="Today Qty" value="{{ edit_item.today_qty if edit_item else 0 }}" required>
 
-<div>Net Qty*</div>
+<div>Net Qty<span style="color: red;">*</div>
 <input type="number" name="net_qty" placeholder="Net Qty" value="{{ edit_item.net_qty if edit_item else '' }}" readonly>
 
-<div>Per Unit Price*</div>
+<div>Per Unit Price<span style="color: red;">*</div>
 <input type="text" name="per_unit_price" placeholder="Per Unit Price" value="{{ edit_item.per_unit_price if edit_item else '' }}" required>
 
-<div>Net Price*</div>
+<div>Net Price<span style="color: red;">*</div>
 <input type="text" name="net_price" placeholder="Net Price" value="{{ edit_item.net_price if edit_item else '' }}" readonly>
 
-<div>Storage Location*</div>
+<div>Storage Location<span style="color: red;">*</div>
 <select name="location" required>
 <option value="">Select location</option>
 <option value="store a" {% if edit_item and edit_item.location == 'store a' %}selected{% endif %}>Store A</option>

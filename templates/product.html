@@ -172,48 +172,48 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Product Name</label>
+            <label>Product Name<span style="color: red;">*</label>
             <input type="text" name="product_name" value="{{ product[1] if product else '' }}" placeholder="Enter product name" required>
           </div>
           <div class="form-group">
-            <label>Product Code</label>
+            <label>Product Code<span style="color: red;">*</label>
             <input type="text" name="product_code" value="{{ product[2] if product else '' }}" placeholder="Enter code" required>
           </div>
           <div class="form-group">
-            <label>Category</label>
+            <label>Category<span style="color: red;">*</label>
             <input type="text" name="category" value="{{ product[3] if product else '' }}" placeholder="e.g., Electronics">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Brand</label>
+            <label>Brand<span style="color: red;">*</label>
             <input type="text" name="brand" value="{{ product[4] if product else '' }}" placeholder="Enter brand">
           </div>
           <div class="form-group">
-            <label>Unit</label>
+            <label>Unit<span style="color: red;">*</label>
             <input type="text" name="unit" value="{{ product[5] if product else '' }}" placeholder="e.g., Piece, Box">
           </div>
           <div class="form-group">
-            <label>Price (per unit)</label>
+            <label>Price (per unit)<span style="color: red;">*</label>
             <input type="number" name="price" value="{{ product[6] if product else '' }}" step="0.01" placeholder="Enter price">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Stock Quantity</label>
+            <label>Stock Quantity<span style="color: red;">*</label>
             <input type="number" name="stock_qty" value="{{ product[7] if product else '' }}" placeholder="Enter stock qty">
           </div>
           <div class="form-group">
-            <label>Minimum Stock Level</label>
+            <label>Minimum Stock Level<span style="color: red;">*</label>
             <input type="number" name="min_stock" value="{{ product[8] if product else '' }}" placeholder="Enter min. level">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group" style="flex: 1 1 100%;">
-            <label>Description</label>
+            <label>Description<span style="color: red;">*</label>
             <textarea name="description" rows="2" placeholder="Enter product description">{{ product[9] if product else '' }}</textarea>
           </div>
         </div>

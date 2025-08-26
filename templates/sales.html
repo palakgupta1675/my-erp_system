@@ -152,31 +152,31 @@
     <form method="POST" action="{{ url_for('sales') }}">
         <input type="hidden" name="sale_id" value="{{ edit_data[0] if edit_data else '' }}">
 
-        <label>Customer Name</label>
+        <label>Customer Name<span style="color: red;">*</label>
         <input type="text" name="customer_name" value="{{ edit_data[1] if edit_data else '' }}" required>
 
-        <label>Customer Contact</label>
+        <label>Customer Contact<span style="color: red;">*</label>
         <input type="tel" name="customer_contact" value="{{ edit_data[2] if edit_data else '' }}" pattern="[0-9]{10}" required>
 
-        <label>Product Name</label>
+        <label>Product Name<span style="color: red;">*</label>
         <input type="text" name="product_name" value="{{ edit_data[3] if edit_data else '' }}" required>
 
-        <label>Product Code</label>
+        <label>Product Code<span style="color: red;">*</label>
         <input type="text" name="product_code" value="{{ edit_data[4] if edit_data else '' }}" required>
 
-        <label>Quantity</label>
+        <label>Quantity<span style="color: red;">*</label>
         <input type="number" name="quantity" value="{{ edit_data[5] if edit_data else '' }}" min="1" required>
 
-        <label>Price Per Unit</label>
+        <label>Price Per Unit<span style="color: red;">*</label>
         <input type="number" name="price_per_unit" value="{{ edit_data[6] if edit_data else '' }}" min="0" step="0.01" required>
 
-        <label>Discount (%)</label>
+        <label>Discount (%)<span style="color: red;">*</label>
         <input type="number" name="discount" value="{{ edit_data[7] if edit_data else '' }}" min="0" max="100" step="0.01">
 
-        <label>GST (%)</label>
+        <label>GST (%)<span style="color: red;">*</label>
         <input type="number" name="gst" value="{{ edit_data[8] if edit_data else '' }}" min="0" max="28" step="0.01">
 
-        <label>Remarks</label>
+        <label>Remarks<span style="color: red;">*</label>
         <input type="text" name="remarks" value="{{ edit_data[9] if edit_data else '' }}">
 
         <button type="submit">{{ 'Update' if edit_data else 'Add Sale' }}</button>
