@@ -475,9 +475,18 @@ def delete_purchase(purchase_id):
     mydb.commit()
     return redirect(url_for('purchase'))
 
+# HR Main Route (Insert / Update / Search / View All)
 @app.route('/hr', methods=['GET', 'POST'])
 def hr():
     if request.method == "POST":
+        # --- Search Request ---
+        search_phone = request.form.get("search_phone")
+        if search_phone:   # if user entered a phone number in search box
+            cursor.execute("SELECT * FROM hr WHERE phone = %s", (search_phone,))
+            employees = cursor.fetchall()
+            return render_template("hr.html", employees=employees, edit_data=None, search_value=search_phone)
+
+        # --- Save or Update Request ---
         emp_id = request.form.get("emp_id")  # hidden field for update
         name = request.form.get("name")
         email = request.form.get("email")
@@ -487,7 +496,6 @@ def hr():
         joining_date = request.form.get("joining_date")
         salary = request.form.get("salary")
 
-        # If it's a Save or Update request
         if name and email and phone:
             if emp_id:  # Update existing record
                 cursor.execute("""
@@ -505,17 +513,11 @@ def hr():
             mydb.commit()
             return redirect(url_for('hr'))
 
-        # If it's a search request
-        search_phone = request.form.get("search_phone")
-        if search_phone:
-            cursor.execute("SELECT * FROM hr WHERE phone = %s", (search_phone,))
-            employees = cursor.fetchall()
-            return render_template("hr.html", employees=employees, edit_data=None, search_value=search_phone)
-
-    # GET request - fetch all records
+    # --- Default: GET request → fetch all records ---
     cursor.execute("SELECT * FROM hr")
     employees = cursor.fetchall()
     return render_template("hr.html", employees=employees, edit_data=None, search_value="")
+
 
 # Edit HR
 @app.route('/hr/edit/<int:emp_id>')
@@ -526,12 +528,14 @@ def edit_hr(emp_id):
     employees = cursor.fetchall()
     return render_template("hr.html", employees=employees, edit_data=record, search_value="")
 
+
 # Delete HR
 @app.route('/hr/delete/<int:emp_id>', methods=['POST'])
 def delete_hr(emp_id):
     cursor.execute("DELETE FROM hr WHERE emp_id=%s", (emp_id,))
     mydb.commit()
     return redirect(url_for('hr'))
+
 
 
 
